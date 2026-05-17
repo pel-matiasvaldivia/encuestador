@@ -22,8 +22,11 @@ services:
     command: redis-server --appendonly yes
 
   backend:
-    build:
-      context: ./backend
+    # Production: pull pre-built image from GitHub Container Registry
+    image: ghcr.io/pel-matiasvaldivia/encuestador/backend:latest
+    # Local dev: comment the image line above and uncomment the build block below
+    # build:
+    #   context: ./backend
     depends_on:
       postgres:
         condition: service_healthy
@@ -39,14 +42,15 @@ services:
       - SMTP_PASS=${SMTP_PASS}
       - DOMAIN=${DOMAIN:-http://localhost}
     volumes:
-      - ./backend:/app
       - uploads_data:/app/uploads
     ports:
       - "8000:8000"
 
   worker:
-    build:
-      context: ./backend
+    # Production: same image as backend, different command
+    image: ghcr.io/pel-matiasvaldivia/encuestador/backend:latest
+    # build:
+    #   context: ./backend
     command: celery -A app.tasks.celery_worker worker --loglevel=info
     depends_on:
       - backend
@@ -61,11 +65,13 @@ services:
       - SMTP_PASS=${SMTP_PASS}
       - DOMAIN=${DOMAIN:-http://localhost}
     volumes:
-      - ./backend:/app
+      - uploads_data:/app/uploads
 
   frontend:
-    build:
-      context: ./frontend
+    # Production: pull pre-built image from GitHub Container Registry
+    image: ghcr.io/pel-matiasvaldivia/encuestador/frontend:latest
+    # build:
+    #   context: ./frontend
     volumes:
       - frontend_build:/app/dist
 
