@@ -51,20 +51,34 @@ def get_dashboard_stats(campaign_id: str, db: Session = Depends(get_tenant_db_de
     
     responses = db.query(Response).filter(Response.campaign_id == campaign_id).all()
     
-    distribucion_estrellas = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+    sumas = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+    counts = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
     promotores = 0
     detractores = 0
     suma_total = 0
     total_preguntas_respondidas = 0
     
     for r in responses:
+        if r.pregunta_1: sumas[1] += r.pregunta_1; counts[1] += 1
+        if r.pregunta_2: sumas[2] += r.pregunta_2; counts[2] += 1
+        if r.pregunta_3: sumas[3] += r.pregunta_3; counts[3] += 1
+        if r.pregunta_4: sumas[4] += r.pregunta_4; counts[4] += 1
+        if r.pregunta_5: sumas[5] += r.pregunta_5; counts[5] += 1
+        
         for p in [r.pregunta_1, r.pregunta_2, r.pregunta_3, r.pregunta_4, r.pregunta_5]:
             if p:
-                distribucion_estrellas[p] += 1
                 suma_total += p
                 total_preguntas_respondidas += 1
                 if p >= 4: promotores += 1
                 elif p <= 2: detractores += 1
+                
+    promedio_por_pregunta = {
+        "P1": round(sumas[1] / counts[1], 1) if counts[1] > 0 else 0,
+        "P2": round(sumas[2] / counts[2], 1) if counts[2] > 0 else 0,
+        "P3": round(sumas[3] / counts[3], 1) if counts[3] > 0 else 0,
+        "P4": round(sumas[4] / counts[4], 1) if counts[4] > 0 else 0,
+        "P5": round(sumas[5] / counts[5], 1) if counts[5] > 0 else 0,
+    }
 
     tasa_respuesta = (total_respondidos / total_enviados * 100) if total_enviados > 0 else 0
     promedio_general = (suma_total / total_preguntas_respondidas) if total_preguntas_respondidas > 0 else 0
@@ -76,7 +90,7 @@ def get_dashboard_stats(campaign_id: str, db: Session = Depends(get_tenant_db_de
         "total_respondidos": total_respondidos,
         "tasa_respuesta": round(tasa_respuesta, 2),
         "promedio_general": round(promedio_general, 2),
-        "distribucion_estrellas": distribucion_estrellas,
+        "promedio_por_pregunta": promedio_por_pregunta,
         "nps": round(nps, 2)
     }
 
@@ -91,6 +105,8 @@ def get_latest_responses(campaign_id: str, db: Session = Depends(get_tenant_db_d
         avg = (r.pregunta_1 + r.pregunta_2 + r.pregunta_3 + r.pregunta_4 + r.pregunta_5) / 5
         result.append({
             "nombre": f"{c.nombre} {c.apellido}",
+            "empresa": c.razon_social,
+            "cuit": c.cuit,
             "promedio": round(avg, 1),
             "hora": r.created_at.isoformat()
         })

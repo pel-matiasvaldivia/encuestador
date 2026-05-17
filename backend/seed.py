@@ -17,10 +17,23 @@ def seed_db():
     print("Iniciando seeder...")
     
     # 1. Ensure public schema objects are created
-    Base.metadata.create_all(bind=engine)
+    public_tables = [t for t in Base.metadata.sorted_tables if getattr(t, "schema", None) == "public"]
+    Base.metadata.create_all(bind=engine, tables=public_tables)
     
     db = SessionLocal()
     
+    superadmin = db.query(User).filter(User.email == "superadmin@satisfactio.com").first()
+    if not superadmin:
+        print("Creando superadmin...")
+        superadmin = User(
+            email="superadmin@satisfactio.com",
+            hashed_password=get_password_hash("admin123"),
+            tenant_id=None,
+            is_superuser=True
+        )
+        db.add(superadmin)
+        db.commit()
+
     tenants_to_create = [
         {"id": "alpha", "name": "Empresa Alpha", "admin_email": "admin@alpha.com"},
         {"id": "beta", "name": "Empresa Beta", "admin_email": "admin@beta.com"}
@@ -49,17 +62,13 @@ def seed_db():
         db.commit()
         
         # We also need to create tables in this schema
-        # SQLAlchemy's Base.metadata.create_all won't easily do this dynamically for specific schemas
-        # without overriding the schema on all tables.
-        # Instead, we set search_path and use raw SQL or a custom create_all approach.
         print(f"Creando tablas para schema {tenant_id}...")
         
-        # A simple way to create tables in the schema without alembic multi-tenant complexity during seed:
-        for table in Base.metadata.sorted_tables:
-            if table.schema != "public":
-                table.schema = tenant_id
-                table.create(bind=engine, checkfirst=True)
-                table.schema = None # reset
+        with engine.begin() as conn:
+            conn.execute(text(f'SET search_path TO "{tenant_id}"'))
+            tenant_tables = [t for t in Base.metadata.sorted_tables if getattr(t, "schema", None) != "public"]
+            for table in tenant_tables:
+                table.create(bind=conn, checkfirst=True)
                 
     db.close()
     print("Seeding completado.")

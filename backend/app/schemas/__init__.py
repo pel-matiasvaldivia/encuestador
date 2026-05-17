@@ -10,7 +10,8 @@ class UserLogin(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
-    tenant_id: str
+    tenant_id: Optional[str] = None
+    is_superuser: bool = False
 
 class TokenData(BaseModel):
     email: Optional[str] = None
@@ -21,6 +22,8 @@ class ContactBase(BaseModel):
     apellido: str
     razon_social: Optional[str] = None
     contacto: str
+    cuit: Optional[str] = None
+    sector: Optional[str] = None
 
 class ContactCreate(ContactBase):
     pass
@@ -32,6 +35,13 @@ class ContactResponse(ContactBase):
     
     class Config:
         from_attributes = True
+
+class QRRegistration(BaseModel):
+    nombre: str
+    apellido: str
+    razon_social: str
+    cuit: str
+    sector: str
 
 class CampaignBase(BaseModel):
     nombre: str
@@ -54,11 +64,39 @@ class SurveyResponse(BaseModel):
     pregunta_3: int
     pregunta_4: int
     pregunta_5: int
+    nombre: Optional[str] = None
+    apellido: Optional[str] = None
+    razon_social: Optional[str] = None
+    cuit: Optional[str] = None
+    sector: Optional[str] = None
 
 class DashboardStats(BaseModel):
     total_enviados: int
     total_respondidos: int
     tasa_respuesta: float
     promedio_general: float
-    distribucion_estrellas: dict
+    promedio_por_pregunta: dict
     nps: float
+
+class TenantSettingsUpdate(BaseModel):
+    company_name: Optional[str] = ""
+    company_phone: Optional[str] = ""
+    company_address: Optional[str] = ""
+    smtp_host: Optional[str] = ""
+    smtp_port: Optional[int] = 587
+    smtp_user: Optional[str] = ""
+    smtp_pass: Optional[str] = ""
+    smtp_from: Optional[str] = ""
+    
+    question_1: Optional[str] = ""
+    question_2: Optional[str] = ""
+    question_3: Optional[str] = ""
+    question_4: Optional[str] = ""
+    question_5: Optional[str] = ""
+
+class TenantSettingsResponse(TenantSettingsUpdate):
+    logo_url: Optional[str] = ""
+    updated_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True

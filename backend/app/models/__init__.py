@@ -21,8 +21,9 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     tenant_id = Column(String, ForeignKey("public.tenants.id"))
     is_active = Column(Boolean, default=True)
+    is_superuser = Column(Boolean, default=False)
 
-# The following models will be created in each tenant's schema dynamically
+# The following models live in each tenant's schema dynamically
 
 class Contact(Base):
     __tablename__ = "contacts"
@@ -30,8 +31,10 @@ class Contact(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     nombre = Column(String, nullable=False)
     apellido = Column(String, nullable=False)
-    razon_social = Column(String)
     contacto = Column(String, nullable=False)
+    razon_social = Column(String)
+    cuit = Column(String)
+    sector = Column(String)
     estado = Column(String, default="pendiente") # pendiente, enviado, respondido
     created_at = Column(DateTime, default=datetime.utcnow)
 
@@ -56,3 +59,26 @@ class Response(Base):
     pregunta_4 = Column(Integer)
     pregunta_5 = Column(Integer)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+class TenantSettings(Base):
+    __tablename__ = "tenant_settings"
+
+    id = Column(Integer, primary_key=True, default=1)
+    company_name = Column(String, default="")
+    company_phone = Column(String, default="")
+    company_address = Column(String, default="")
+    logo_url = Column(String, default="")
+    smtp_host = Column(String, default="")
+    smtp_port = Column(Integer, default=587)
+    smtp_user = Column(String, default="")
+    smtp_pass = Column(String, default="")
+    smtp_from = Column(String, default="")
+    
+    # Question Template
+    question_1 = Column(String, default="¿Cómo calificaría nuestro servicio en general?")
+    question_2 = Column(String, default="¿Qué tan probable es que nos recomiende?")
+    question_3 = Column(String, default="¿Cómo califica el tiempo de respuesta?")
+    question_4 = Column(String, default="¿Cómo califica la amabilidad del personal?")
+    question_5 = Column(String, default="¿Cómo califica la resolución de su problema?")
+    
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

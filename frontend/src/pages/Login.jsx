@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
@@ -17,7 +17,14 @@ export default function Login() {
       const res = await api.post('/auth/login', { email, password });
       localStorage.setItem('token', res.data.access_token);
       localStorage.setItem('tenant_id', res.data.tenant_id);
-      navigate('/');
+      
+      if (res.data.is_superuser) {
+        localStorage.setItem('is_superuser', 'true');
+        navigate('/admin/tenants');
+      } else {
+        localStorage.removeItem('is_superuser');
+        navigate('/');
+      }
     } catch (err) {
       setError('Credenciales incorrectas');
     } finally {
