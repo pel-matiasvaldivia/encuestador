@@ -12,10 +12,12 @@ export default function Campaigns() {
   const [copyStatus, setCopyStatus] = useState({});
   const [editModal, setEditModal] = useState({ open: false, campaign: null });
   const [editForm, setEditForm] = useState({ nombre: '', canal: '' });
+  const [domain, setDomain] = useState('');
 
   useEffect(() => {
     fetchCampaigns();
     fetchContacts();
+    api.get('/settings/').then(res => setDomain(res.data.domain)).catch(e => console.error(e));
   }, []);
 
   const fetchCampaigns = async () => {
@@ -112,7 +114,8 @@ export default function Campaigns() {
   };
 
   const handleCopyLink = (contactId, campaignId) => {
-    const url = `${window.location.origin}/s/${contactId}?c=${campaignId}`;
+    const baseUrl = domain || window.location.origin;
+    const url = `${baseUrl}/s/${contactId}?c=${campaignId}`;
     navigator.clipboard.writeText(url);
     setCopyStatus({ ...copyStatus, [contactId]: true });
     setTimeout(() => setCopyStatus(p => ({ ...p, [contactId]: false })), 2000);
@@ -347,7 +350,7 @@ export default function Campaigns() {
             <h3 className="text-xl font-bold text-gray-800 mb-2">QR de Campaña</h3>
             <p className="text-gray-500 text-sm mb-6">{qrModal.nombre}</p>
             <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100 mb-6 flex justify-center">
-              <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`${window.location.origin}/qr/${qrModal.campaignId}`)}`}
+              <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`${domain || window.location.origin}/qr/${qrModal.campaignId}`)}`}
                 alt="QR Code" className="w-48 h-48 rounded-lg shadow-sm" />
             </div>
             <p className="text-xs text-gray-400">Escanee este código en el frontdesk para que los clientes realicen la encuesta.</p>

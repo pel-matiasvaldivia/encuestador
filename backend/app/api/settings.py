@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_tenant_db_dependency, get_current_tenant_id
 from app.models import TenantSettings
 from app.schemas import TenantSettingsResponse, TenantSettingsUpdate
+from app.core.config import settings as app_settings
 
 router = APIRouter()
 
@@ -24,7 +25,11 @@ def _get_or_create_settings(db: Session) -> TenantSettings:
 
 @router.get("/", response_model=TenantSettingsResponse)
 def get_settings(db: Session = Depends(get_tenant_db_dependency)):
-    return _get_or_create_settings(db)
+    s = _get_or_create_settings(db)
+    # Inject server-side DOMAIN so the frontend can build correct public URLs (QR codes, etc.)
+    result = TenantSettingsResponse.model_validate(s)
+    result.domain = app_settings.DOMAIN
+    return result
 
 
 @router.put("/", response_model=TenantSettingsResponse)

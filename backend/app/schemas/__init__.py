@@ -96,6 +96,7 @@ class TenantSettingsUpdate(BaseModel):
 
 class TenantSettingsResponse(TenantSettingsUpdate):
     logo_url: Optional[str] = ""
+    domain: Optional[str] = ""
     updated_at: Optional[datetime] = None
 
     class Config:
