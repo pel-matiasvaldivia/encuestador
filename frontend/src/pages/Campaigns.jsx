@@ -194,7 +194,8 @@ export default function Campaigns() {
                   <tr className="text-gray-500 border-b text-sm">
                     <th className="pb-3 font-medium">Nombre</th>
                     <th className="pb-3 font-medium">Canal</th>
-                    <th className="pb-3 font-medium">Estado</th>
+                    <th className="pb-3 font-medium text-center">Estado</th>
+                    <th className="pb-3 font-medium text-center">URL</th>
                     <th className="pb-3 font-medium text-right">Acciones</th>
                   </tr>
                 </thead>
@@ -203,13 +204,30 @@ export default function Campaigns() {
                     <tr key={c.id} className="hover:bg-gray-50 transition-colors">
                       <td className="py-3 font-semibold text-gray-800">{c.nombre}</td>
                       <td className="py-3 text-gray-600 capitalize text-sm">{c.canal}</td>
-                      <td className="py-3">
+                      <td className="py-3 text-center">
                         <span className={`px-2 py-1 rounded-full text-xs font-bold ${badgeClass[c.estado] || 'bg-gray-100 text-gray-500'}`}>
                           {estadoLabel[c.estado] || c.estado}
                         </span>
                       </td>
+                      <td className="py-3 text-center">
+                        {(c.estado === 'en_curso' || c.estado === 'pausada') ? (
+                          <button 
+                            onClick={() => {
+                              const url = `${domain || window.location.origin}/qr/${c.id}`;
+                              navigator.clipboard.writeText(url);
+                              alert('¡URL de campaña copiada!');
+                            }}
+                            title="Copiar URL de la campaña"
+                            className="p-2 rounded-full text-indigo-600 hover:bg-indigo-50 transition-all inline-flex items-center justify-center border border-indigo-100"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+                            </svg>
+                          </button>
+                        ) : '-'}
+                      </td>
                       <td className="py-3">
-                        <div className="flex justify-end items-center gap-1 flex-wrap">
+                        <div className="flex justify-end items-center gap-1.5 flex-wrap">
 
                           {/* ✏️ Edit – not available when finished */}
                           {c.estado !== 'finalizada' && (
@@ -227,14 +245,6 @@ export default function Campaigns() {
                               className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xs font-bold hover:shadow-md transition-all">
                               <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                               Lanzar
-                            </button>
-                          )}
-
-                          {/* ⏸️ Pause */}
-                          {c.estado === 'en_curso' && (
-                            <button onClick={() => handlePause(c.id)} title="Pausar"
-                              className="p-1.5 rounded-lg text-orange-500 hover:bg-orange-50 transition-all">
-                              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
                             </button>
                           )}
 
@@ -264,28 +274,12 @@ export default function Campaigns() {
                             </button>
                           )}
 
-                          {/* 📱 QR & Link – en curso o pausadas */}
+                          {/* 📱 QR */}
                           {(c.estado === 'en_curso' || c.estado === 'pausada') && (
-                            <div className="flex items-center gap-1">
-                              <button onClick={() => setQrModal({ open: true, campaignId: c.id, nombre: c.nombre })} title="Ver QR"
-                                className="p-1.5 rounded-lg text-indigo-500 hover:bg-indigo-50 transition-all text-xs font-bold border border-indigo-100">
-                                QR
-                              </button>
-                              <button 
-                                onClick={() => {
-                                  const url = `${domain || window.location.origin}/qr/${c.id}`;
-                                  navigator.clipboard.writeText(url);
-                                  alert('¡Link de campaña copiado!');
-                                }} 
-                                title="Copiar Link de Campaña"
-                                className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-all font-bold text-xs"
-                              >
-                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                                </svg>
-                                Link
-                              </button>
-                            </div>
+                            <button onClick={() => setQrModal({ open: true, campaignId: c.id, nombre: c.nombre })} title="Ver QR"
+                              className="p-1.5 rounded-lg text-indigo-500 hover:bg-indigo-50 transition-all text-xs font-bold border border-indigo-100">
+                              QR
+                            </button>
                           )}
 
                           {/* 📥 Report – only finished */}
@@ -311,7 +305,7 @@ export default function Campaigns() {
                     </tr>
                   ))}
                   {campaigns.length === 0 && (
-                    <tr><td colSpan="4" className="text-center py-8 text-gray-400">No hay campañas creadas</td></tr>
+                    <tr><td colSpan="5" className="text-center py-8 text-gray-400">No hay campañas creadas</td></tr>
                   )}
                 </tbody>
               </table>
