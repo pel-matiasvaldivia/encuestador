@@ -246,6 +246,14 @@ export default function Campaigns() {
                             </button>
                           )}
 
+                          {/* ⏸️ Pause */}
+                          {c.estado === 'en_curso' && (
+                            <button onClick={() => handlePause(c.id)} title="Pausar"
+                              className="p-1.5 rounded-lg text-orange-500 hover:bg-orange-50 transition-all">
+                              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                            </button>
+                          )}
+
                           {/* ✅ Finish */}
                           {(c.estado === 'en_curso' || c.estado === 'pausada') && (
                             <button onClick={() => handleFinish(c.id)} title="Finalizar campaña"
@@ -256,11 +264,11 @@ export default function Campaigns() {
                             </button>
                           )}
 
-                          {/* 📱 QR – only active */}
-                          {c.estado === 'en_curso' && (
-                            <>
+                          {/* 📱 QR & Link – en curso o pausadas */}
+                          {(c.estado === 'en_curso' || c.estado === 'pausada') && (
+                            <div className="flex items-center gap-1">
                               <button onClick={() => setQrModal({ open: true, campaignId: c.id, nombre: c.nombre })} title="Ver QR"
-                                className="p-1.5 rounded-lg text-indigo-500 hover:bg-indigo-50 transition-all text-xs font-bold">
+                                className="p-1.5 rounded-lg text-indigo-500 hover:bg-indigo-50 transition-all text-xs font-bold border border-indigo-100">
                                 QR
                               </button>
                               <button 
@@ -270,13 +278,14 @@ export default function Campaigns() {
                                   alert('¡Link de campaña copiado!');
                                 }} 
                                 title="Copiar Link de Campaña"
-                                className="p-1.5 rounded-lg text-purple-600 hover:bg-purple-50 transition-all font-bold"
+                                className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-all font-bold text-xs"
                               >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
                                 </svg>
+                                Link
                               </button>
-                            </>
+                            </div>
                           )}
 
                           {/* 📥 Report – only finished */}
