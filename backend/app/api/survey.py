@@ -37,13 +37,18 @@ def get_tenant_for_contact(contact_id: str):
         db.close()
 
 def get_tenant_for_campaign(campaign_id: str):
+    from uuid import UUID
+    try:
+        campaign_uuid = UUID(campaign_id)
+    except ValueError:
+        return None
     db = SessionLocal()
     try:
         from app.models import Tenant, Campaign
         tenants = db.query(Tenant).all()
         for tenant in tenants:
             db.execute(text(f'SET search_path TO "{tenant.id}"'))
-            campaign = db.query(Campaign).filter(Campaign.id == campaign_id).first()
+            campaign = db.query(Campaign).filter(Campaign.id == campaign_uuid).first()
             if campaign:
                 return tenant.id
         return None

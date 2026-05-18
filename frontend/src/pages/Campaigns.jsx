@@ -349,11 +349,30 @@ export default function Campaigns() {
             <button onClick={() => setQrModal({ ...qrModal, open: false })} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
             <h3 className="text-xl font-bold text-gray-800 mb-2">QR de Campaña</h3>
             <p className="text-gray-500 text-sm mb-6">{qrModal.nombre}</p>
-            <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100 mb-6 flex justify-center">
+            <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100 mb-4 flex justify-center">
               <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`${domain || window.location.origin}/qr/${qrModal.campaignId}`)}`}
                 alt="QR Code" className="w-48 h-48 rounded-lg shadow-sm" />
             </div>
-            <p className="text-xs text-gray-400">Escanee este código en el frontdesk para que los clientes realicen la encuesta.</p>
+            
+            <div className="mb-6 p-3 bg-gray-50 rounded-xl border border-gray-100 flex items-center gap-2">
+              <input 
+                readOnly 
+                className="bg-transparent text-[10px] text-gray-500 font-mono flex-1 outline-none overflow-hidden text-ellipsis"
+                value={`${domain || window.location.origin}/qr/${qrModal.campaignId}`}
+                onClick={(e) => e.target.select()}
+              />
+              <button 
+                onClick={() => {
+                  navigator.clipboard.writeText(`${domain || window.location.origin}/qr/${qrModal.campaignId}`);
+                  alert('¡Enlace copiado!');
+                }}
+                className="text-purple-600 hover:text-purple-800 font-bold text-[10px] uppercase whitespace-nowrap"
+              >
+                Copiar
+              </button>
+            </div>
+
+            <p className="text-xs text-gray-400 mb-6">Escanee este código en el frontdesk o comparta el link para que los clientes realicen la encuesta.</p>
             <button onClick={() => window.print()} className="mt-6 w-full py-3 bg-purple-600 text-white font-bold rounded-xl hover:bg-purple-700 transition-all flex items-center justify-center gap-2">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
               Imprimir QR
