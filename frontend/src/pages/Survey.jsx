@@ -13,7 +13,7 @@ export default function Survey() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   
-  const [step, setStep] = useState('personal_info');
+  const [step, setStep] = useState(null);
   const [personalData, setPersonalData] = useState({
     nombre: '',
     apellido: '',
@@ -29,6 +29,8 @@ export default function Survey() {
         setData(res.data);
         if (res.data.needs_personal_info === false) {
           setStep(0);
+        } else {
+          setStep('personal_info');
         }
       } catch (err) {
         setError('Encuesta no disponible o ya fue respondida.');
@@ -60,7 +62,7 @@ export default function Survey() {
     }
   };
 
-  if (loading && !data) {
+  if (loading || !data || step === null) {
     return <div className="min-h-screen flex items-center justify-center bg-gray-50"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div></div>;
   }
 

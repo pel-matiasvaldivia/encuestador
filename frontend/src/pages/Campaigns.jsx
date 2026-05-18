@@ -195,7 +195,7 @@ export default function Campaigns() {
                     <th className="pb-3 font-medium">Nombre</th>
                     <th className="pb-3 font-medium">Canal</th>
                     <th className="pb-3 font-medium text-center">Estado</th>
-                    <th className="pb-3 font-medium text-center">URL</th>
+                    <th className="pb-3 font-medium text-center">Encuesta</th>
                     <th className="pb-3 font-medium text-right">Acciones</th>
                   </tr>
                 </thead>
