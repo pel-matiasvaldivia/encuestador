@@ -76,7 +76,8 @@ def get_survey_data(token: str):
             "contacto": f"{contact.nombre} {contact.apellido}",
             "company_name": settings.company_name if settings and settings.company_name else "Sistema de Encuestas",
             "logo_url": settings.logo_url if settings else "",
-            "preguntas": questions
+            "preguntas": questions,
+            "needs_personal_info": not (contact.nombre and contact.apellido and contact.nombre != "Nuevo" and contact.nombre != "Invitado")
         }
     finally:
         db.close()

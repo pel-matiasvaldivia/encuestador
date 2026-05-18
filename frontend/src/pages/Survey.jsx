@@ -27,6 +27,9 @@ export default function Survey() {
       try {
         const res = await axios.get(`/api/survey/${token}`);
         setData(res.data);
+        if (res.data.needs_personal_info === false) {
+          setStep(0);
+        }
       } catch (err) {
         setError('Encuesta no disponible o ya fue respondida.');
       } finally {
