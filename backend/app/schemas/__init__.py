@@ -41,7 +41,7 @@ class QRRegistration(BaseModel):
     apellido: str
     razon_social: str
     cuit: str
-    sector: str
+    sector: Optional[str] = ""
 
 class CampaignBase(BaseModel):
     nombre: str
